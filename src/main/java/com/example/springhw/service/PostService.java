@@ -1,5 +1,6 @@
 package com.example.springhw.service;
 
+import com.example.springhw.dto.PostDeleteDto;
 import com.example.springhw.dto.PostRequestDto;
 import com.example.springhw.dto.PostResponseDto;
 import com.example.springhw.entity.Posts;
@@ -58,7 +59,8 @@ public class PostService {
     }
 
     @Transactional
-    public Long delete(Long id, PostRequestDto requestDto) {
+    public Long delete(Long id, PostDeleteDto deleteDto) {
+        postRepository.deleteByIdAndPassword(id, deleteDto.getPassword());
         return 0L;
     }
 }

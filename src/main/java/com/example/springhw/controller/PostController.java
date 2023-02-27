@@ -1,5 +1,6 @@
 package com.example.springhw.controller;
 
+import com.example.springhw.dto.PostDeleteDto;
 import com.example.springhw.dto.PostRequestDto;
 import com.example.springhw.dto.PostResponseDto;
 import com.example.springhw.entity.Posts;
@@ -47,7 +48,7 @@ public class PostController {
 
     // 요구사항 5. 선택 게시글 삭제 - 비밀번호 일치 시 삭제
     @DeleteMapping("/api/posts/{id}")
-    public Long deletePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
-        return postService.delete(id, requestDto);
+    public Long deletePost(@PathVariable Long id, @RequestBody PostDeleteDto deleteDto) {
+        return postService.delete(id, deleteDto);
     }
 }
