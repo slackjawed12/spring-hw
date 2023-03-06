@@ -1,16 +1,18 @@
 package com.example.springhw.controller;
 
-import com.example.springhw.dto.PostDeleteDto;
 import com.example.springhw.dto.PostRequestDto;
 import com.example.springhw.dto.PostResponseDto;
 import com.example.springhw.entity.Posts;
 import com.example.springhw.service.PostService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
@@ -29,26 +31,24 @@ public class PostController {
     }
 
     // 요구사항 2. 게시글 작성
-    @PostMapping("/api/posts")
-    public Posts createPost(@RequestBody PostRequestDto requestDto) {
-        return postService.createPost(requestDto);
+    @PostMapping("/")
+    public PostResponseDto createPost(@RequestBody PostRequestDto requestDto, HttpServletRequest request) {
+        return postService.createPost(requestDto, request);
     }
 
-    // 요구사항 3. 선택 게시글 조회
-    @GetMapping("/api/posts/{id}")
+    @GetMapping("/{id}")
     public PostResponseDto showPost(@PathVariable Long id){
         return postService.getPost(id);
     }
 
-    // 요구사항 4. 선택 게시글 수정 - 비밀번호 일치 시 수정
-    @PutMapping("/api/posts/{id}")
-    public Long updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
-        return postService.update(id, requestDto);
+    @PutMapping("/{id}")
+    public Long updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto,
+                           HttpServletRequest request) {
+        return postService.update(id, requestDto, request);
     }
 
-    // 요구사항 5. 선택 게시글 삭제 - 비밀번호 일치 시 삭제
-    @DeleteMapping("/api/posts/{id}")
-    public Long deletePost(@PathVariable Long id, @RequestBody PostDeleteDto deleteDto) {
-        return postService.delete(id, deleteDto);
+    @DeleteMapping("/{id}")
+    public Long deletePost(@PathVariable Long id, HttpServletRequest request) {
+        return postService.delete(id, request);
     }
 }

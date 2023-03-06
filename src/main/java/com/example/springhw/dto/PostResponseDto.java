@@ -11,15 +11,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PostResponseDto {
     private String title;
-    private String writer;
+    private String username;
     private String contents;
     @CreatedDate
     private LocalDateTime createdAt;
 
-    public PostResponseDto(Posts post){
-        this.title=post.getTitle();
-        this.writer= post.getWriter();
-        this.contents= post.getContents();
-        this.createdAt=post.getCreatedAt();
+    public PostResponseDto(Posts post) {
+        this.title = post.getTitle();
+        this.username = post.getMember().getUsername();
+        this.contents = post.getContents();
+        this.createdAt = post.getCreatedAt();
     }
 }

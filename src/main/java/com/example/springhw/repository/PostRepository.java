@@ -8,6 +8,4 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Posts, Long> {
     List<Posts> findAllByOrderByModifiedAtDesc();
-    Optional<Posts> findFirstByIdAndPassword(Long id, String password);
-    void deleteByIdAndPassword(Long id, String password);
 }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
-public class Posts extends Timestamped{
+public class Posts extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -17,24 +17,20 @@ public class Posts extends Timestamped{
     private String title;
 
     @Column(nullable = false)
-    private String writer;
-
-    @Column(nullable = false)
     private String contents;
 
-    @Column(nullable = false)
-    private String password;
+    @ManyToOne
+    @JoinColumn(name = "MEMBER_ID", nullable = false)
+    private Member member;
 
-    public Posts(PostRequestDto requestDto) {
-        this.title=requestDto.getTitle();
-        this.writer=requestDto.getWriter();
-        this.contents= requestDto.getContents();
-        this.password=requestDto.getPassword();
+    public Posts(PostRequestDto requestDto, Member member) {
+        this.title = requestDto.getTitle();
+        this.contents = requestDto.getContents();
+        this.member = member;
     }
 
     public void update(PostRequestDto requestDto) {
-        this.title= requestDto.getTitle();
-        this.writer= requestDto.getWriter();
-        this.contents= requestDto.getContents();
+        this.title = requestDto.getTitle();
+        this.contents = requestDto.getContents();
     }
 }
