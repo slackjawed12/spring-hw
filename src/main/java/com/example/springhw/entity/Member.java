@@ -1,4 +1,4 @@
-package com.example.springhw.assignment;
+package com.example.springhw.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,11 +13,17 @@ public class Member {
     Long id;
 
     @Column(nullable = false)
-    String name;
+    String username;
+
+    @Column(nullable = false)
+    String password;
 
     @Column(nullable = false)
     String email;
 
-    @Column(nullable = false)
-    String pw;
+    public Member(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 }
