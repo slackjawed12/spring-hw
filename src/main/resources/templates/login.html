@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>로그인 페이지</title>
+</head>
+<body>
+<div id="login-form">
+    <div id="login-title">Log in</div>
+    <button id="login-id-btn" onclick="location.href='/member/signup'">
+        회원 가입하기
+    </button>
+    <div class="login-id-label">아이디</div>
+    <input id="username" type="text" name="username" class="login-input-box">
+
+    <div class="login-id-label">비밀번호</div>
+    <input id="password" type="password" name="password" class="login-input-box">
+
+    <button id="login-id-submit" onclick="login()">로그인</button>
+</div>
+</body>
+<script>
+    function login() {
+        console.log("login call");
+
+        let username = $('#username').val();
+        let password = $('#password').val();
+
+        if (username == '') {
+            alert('ID를 입력해주세요');
+            return;
+        } else if (password == '') {
+            alert('비밀번호를 입력해주세요');
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: `/member/login`,
+            contentType: "application/json",
+            data: JSON.stringify({username: username, password: password}),
+            success: function (response, status, xhr) {
+                if (response === 'success') {
+                    let url = window.location.host;
+                    document.cookie =
+                        'Authorization' + '=' + xhr.getResponseHeader('Authorization') + ';path=/';
+                    window.location.href = 'http://' + url;
+                } else {
+                    alert('로그인에 실패하셨습니다. 다시 로그인해 주세요.')
+                    window.location.reload();
+                }
+            }
+        })
+    }
+
+</script>
+</html>

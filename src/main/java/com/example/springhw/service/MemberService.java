@@ -32,12 +32,13 @@ public class MemberService {
                 .map(MemberResponseDto::new).collect(Collectors.toList());
     }
 
-    public String saveMember(SignupRequestDto requestDto) {
+    public String signup(SignupRequestDto requestDto, HttpServletResponse response) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
         if (memberRepository.findByUsername(username).isEmpty()) {
             String email = username + "@myblog.com";    // 이메일 디폴트 값 설정
             Member member = new Member(username, password, email);
+            response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(username));
             memberRepository.save(member);
             return "회원 가입 성공";
         }
@@ -53,7 +54,7 @@ public class MemberService {
             if (m.getPassword().equals(password)) { // 로그인 성공
                 // Authorization header에 토큰 내용 추가
                 response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(username));
-                return "로그인 성공";
+                return "success";
             } else {    // 비밀번호 틀림
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return "비밀번호 틀림";

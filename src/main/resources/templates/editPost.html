@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 작성</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+    function getToken() {
+      let cName = 'Authorization' + '=';
+      let cookieData = document.cookie;
+      let cookie = cookieData.indexOf('Authorization');
+      let auth = '';
+      if(cookie !== -1){
+        cookie += cName.length;
+        let end = cookieData.indexOf(';', cookie);
+        if(end === -1)end = cookieData.length;
+        auth = cookieData.substring(cookie, end);
+      }
+      return auth;
+    }
+
+    function editpost() {
+      let title = $('#title').val();
+      let contents = $('#contents').val();
+      const auth = getToken();
+      if (title === '') {
+        alert('제목을 입력해주세요');
+        return;
+      } else if (contents === '') {
+        alert('내용을 입력해주세요');
+        return;
+      }
+
+      $.ajax({
+        type: "POST",
+        url: `/api/posts/${post.id}`,
+        contentType: "application/json",
+        data: JSON.stringify({title: title, contents: contents}),
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader("Authorization", auth);
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+<div class="post-wrap">
+  <div class="post-label">제목</div>
+  <input id="title" type="text" name="title" class="post-input-box" th:value="${post.title}">
+  <div class="post-label">내용</div>
+  <input id="contents" type="text" name="contents" class="post-input-box" th:value="${post.contents}">
+  <button id="post-submit" onclick="editpost()">수정 완료</button>
+</div>
+</body>
+</html>

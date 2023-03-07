@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Blog Service</title>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<a href="/api/posts/new">
+  <button>글 작성하기</button>
+</a>
+<div class="post-wrap">
+  <table>
+    <tr>
+      <th>제목</th>
+      <th>글쓴이</th>
+      <th>내용</th>
+      <th>작성 시각</th>
+      <th>상세</th>
+      <th>수정</th>
+      <th>삭제</th>
+    </tr>
+    <tr th:each="post : ${posts}">
+      <td th:text="${post.title}">제목</td>
+      <td th:text="${post.username}">글쓴이</td>
+      <td th:text="${post.contents}">내용</td>
+      <td th:text="${post.createdAt}">작성 시각</td>
+      <td>
+        <button th:onclick="|location.href='@{/api/posts/{postId}(postId=${post.id})}'|">상세보기</button>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
+
+</html>
