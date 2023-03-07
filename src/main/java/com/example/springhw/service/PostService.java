@@ -78,7 +78,8 @@ public class PostService {
     }
 
     @Transactional
-    public Long update(Long id, PostRequestDto requestDto, HttpServletRequest request) {
+    public PostResponseDto update(Long id, PostRequestDto requestDto, HttpServletRequest request) {
+        log.info("service update param id={}", id);
         String token = jwtUtil.resolveToken(request);   // 헤더에서 토큰 값 가져오기
         Claims claims;
         Optional<Posts> post = postRepository.findById(id);
@@ -104,7 +105,7 @@ public class PostService {
             Posts p = post.get();
             if (m.getId().equals(p.getMember().getId())) {  // 멤버 id와 post entity의 멤버 id가 같으면 수정
                 p.update(requestDto);
-                return id;
+                return new PostResponseDto(p);
             } else {
                 return null;
             }

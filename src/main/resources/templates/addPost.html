@@ -18,8 +18,7 @@
             }
             return auth;
         }
-
-        function writepost() {
+        function writePost() {
             let title = $('#title').val();
             let contents = $('#contents').val();
             const auth = getToken();
@@ -38,6 +37,9 @@
                 data: JSON.stringify({title: title, contents: contents}),
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("Authorization", auth);
+                },
+                success: function(response){
+
                 }
             });
         }
@@ -51,7 +53,7 @@
     <div class="post-label">내용</div>
     <input id="contents" type="text" name="contents" class="post-input-box">
 
-    <button id="post-submit" onclick="writepost()">작성 완료</button>
+    <button id="post-submit" onclick="writePost()">작성 완료</button>
 </div>
 </body>
 </html>

@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -22,7 +23,6 @@ import java.util.List;
 @RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
-
     private final MemberService memberService;
 
     /**
@@ -58,17 +58,22 @@ public class MemberController {
     /**
      * 회원 가입
      * request : html form tag - x-www-urlencoded (username, password)
-     * response : message (String)
+     * response : 로그인 페이지로 리다이렉트
      */
     @PostMapping("/signup")
-    @ResponseBody
-    public ResponseEntity<String> signup(@ModelAttribute("requestDto") @Valid SignupRequestDto requestDto,
+    public String signup(@ModelAttribute("requestDto") @Valid SignupRequestDto requestDto,
+                                         Model model,
                                          HttpServletResponse response,
                                          BindingResult result) {
         if (result.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getFieldError().getDefaultMessage());
+            model.addAttribute("msg",
+                    ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getFieldError().getDefaultMessage()));
+            return "index";
         }
-        return ResponseEntity.ofNullable(memberService.signup(requestDto, response));
+        MemberResponseDto member = memberService.signup(requestDto, response);
+        model.addAttribute("member", member);
+        model.addAttribute("msg", "success");
+        return "redirect:/member/login";
     }
 
     /**

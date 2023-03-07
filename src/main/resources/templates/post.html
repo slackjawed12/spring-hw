@@ -1,44 +1,78 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>Blog Service</title>
+    <meta charset="UTF-8">
+    <title>Blog Service</title>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+    <script th:inline="javascript">
+        function getToken() {
+            let cName = 'Authorization' + '=';
+            let cookieData = document.cookie;
+            let cookie = cookieData.indexOf('Authorization');
+            let auth = '';
+            if (cookie !== -1) {
+                cookie += cName.length;
+                let end = cookieData.indexOf(';', cookie);
+                if (end === -1) end = cookieData.length;
+                auth = cookieData.substring(cookie, end);
+            }
+            return auth;
+        }
+
+        function deletePost(postId) {
+            const auth = getToken();
+
+            $.ajax({
+                type: "DELETE",
+                url: `/api/posts/${postId}`,
+                contentType: "application/json",
+                data: {},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Authorization", auth);
+                },
+                success: function (response) {
+                    if (response === 'success') {
+                        alert("삭제 완료");
+                        window.location.reload();
+                    }
+                }
+            });
+        }
+    </script>
 </head>
 
 <body>
 <a href="/api/posts/new">
-  <button>글 작성하기</button>
+    <button>글 작성하기</button>
+</a>
+<a href="/api/posts">
+    <button>전체 글 목록</button>
 </a>
 <div class="post-wrap">
-  <table>
-    <tr>
-      <th>제목</th>
-      <th>글쓴이</th>
-      <th>내용</th>
-      <th>작성 시각</th>
-      <th>상세</th>
-      <th>수정</th>
-      <th>삭제</th>
-    </tr>
-    <tr th:each="post : ${posts}">
-      <td th:text="${post.title}">제목</td>
-      <td th:text="${post.username}">글쓴이</td>
-      <td th:text="${post.contents}">내용</td>
-      <td th:text="${post.createdAt}">작성 시각</td>
-      <td>
-        <button th:onclick="|location.href='@{/api/posts/{postId}(postId=${post.id})}'|">상세보기</button>
-      </td>
-      <td>
-<!--        수정-->
-      </td>
-      <td>
-<!--        삭제-->
-      </td>
-    </tr>
-  </table>
+    <table>
+        <tr>
+            <th>제목</th>
+            <th>글쓴이</th>
+            <th>내용</th>
+            <th>작성 시각</th>
+            <th>수정</th>
+            <th>삭제</th>
+        </tr>
+        <tr>
+            <td th:text="${post.title}">제목</td>
+            <td th:text="${post.username}">글쓴이</td>
+            <td th:text="${post.contents}">내용</td>
+            <td th:text="${post.createdAt}">작성시각</td>
+            <td>
+                <button th:onclick="|location.href='@{/api/posts/{postId}(postId=${post.id})}/edit'|">수정</button>
+            </td>
+            <td>
+                <button th:attr="onclick=|deletePost(${post.id})|">삭제</button>
+            </td>
+        </tr>
+    </table>
 </div>
 </body>
 

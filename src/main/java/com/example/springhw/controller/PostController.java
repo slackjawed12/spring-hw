@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -20,12 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-
-    // 비밀번호, 날짜 잘 들어갔나 확인 용도
-    @GetMapping("/admin")
-    public List<Posts> getPostsInfo() {
-        return postService.getPostsInfo();
-    }
 
     /**
      * 전체 게시글 목록 조회 - 작성 날짜 기준 내림차순 정렬
@@ -46,26 +41,46 @@ public class PostController {
     }
 
     /**
+     * 수정 폼
+     */
+    @GetMapping("/{id}/edit")
+    public String editPostForm(@PathVariable Long id, Model model) {
+        PostResponseDto post = postService.getPost(id);
+        model.addAttribute("post", post);
+        return "editPost";
+    }
+
+    /**
      * 게시글 작성
+     * response : 작성 후 해당 게시글 상세보기 페이지로 리다이렉트
      */
     @PostMapping
     public String createPost(@RequestBody PostRequestDto requestDto,
+                             RedirectAttributes redirectAttributes,
                              HttpServletRequest request) {
-        log.info("title={}", requestDto.getTitle());
-        log.info("contents={}", requestDto.getContents());
-        postService.createPost(requestDto, request);
-        return "redirect:/api/posts";
+        PostResponseDto post = postService.createPost(requestDto, request);
+        redirectAttributes.addAttribute("postId", post.getId());
+        return "redirect:/api/posts/{postId}";
     }
 
     @GetMapping("/{id}")
-    public PostResponseDto showPost(@PathVariable Long id) {
-        return postService.getPost(id);
+    public String showPost(@PathVariable Long id, Model model) {
+        PostResponseDto post = postService.getPost(id);
+        model.addAttribute("post", post);
+        return "post";
     }
 
+    @ResponseBody
     @PutMapping("/{id}")
-    public Long updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto,
-                           HttpServletRequest request) {
-        return postService.update(id, requestDto, request);
+    public String updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto,
+                             HttpServletRequest request) {
+        log.info("updatePost param id={}", id);
+        PostResponseDto post = postService.update(id, requestDto, request);
+        if (post != null) {
+            return "success";
+        } else {
+            return "fail";
+        }
     }
 
     @DeleteMapping("/{id}")

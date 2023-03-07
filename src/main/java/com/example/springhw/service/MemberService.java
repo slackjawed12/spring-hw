@@ -32,7 +32,7 @@ public class MemberService {
                 .map(MemberResponseDto::new).collect(Collectors.toList());
     }
 
-    public String signup(SignupRequestDto requestDto, HttpServletResponse response) {
+    public MemberResponseDto signup(SignupRequestDto requestDto, HttpServletResponse response) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
         if (memberRepository.findByUsername(username).isEmpty()) {
@@ -40,9 +40,9 @@ public class MemberService {
             Member member = new Member(username, password, email);
             response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(username));
             memberRepository.save(member);
-            return "회원 가입 성공";
+            return new MemberResponseDto(member);
         }
-        return "중복된 아이디";
+        return null;
     }
 
     public String login(LoginRequestDto requestDto, HttpServletResponse response) {
@@ -57,11 +57,11 @@ public class MemberService {
                 return "success";
             } else {    // 비밀번호 틀림
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return "비밀번호 틀림";
+                return null;
             }
         } else {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return "해당하는 유저 이름 없음";
+            return null;
         }
     }
 }
