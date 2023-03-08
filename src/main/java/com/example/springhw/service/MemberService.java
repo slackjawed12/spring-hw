@@ -4,6 +4,7 @@ import com.example.springhw.dto.LoginRequestDto;
 import com.example.springhw.dto.MemberResponseDto;
 import com.example.springhw.dto.SignupRequestDto;
 import com.example.springhw.entity.Member;
+import com.example.springhw.entity.MemberRoleEnum;
 import com.example.springhw.jwt.JwtUtil;
 import com.example.springhw.repository.MemberRepository;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +20,8 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
+
+    private static final String ADMIN_KEY = "woohaha";
 
     public MemberResponseDto findMember(Long id) {
         Member member = memberRepository.findById(id)
@@ -32,36 +34,39 @@ public class MemberService {
                 .map(MemberResponseDto::new).collect(Collectors.toList());
     }
 
-    public MemberResponseDto signup(SignupRequestDto requestDto, HttpServletResponse response) {
+    public MemberResponseDto signup(SignupRequestDto requestDto,
+                                    HttpServletResponse response) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
+        boolean admin = requestDto.isAdmin();
+
         if (memberRepository.findByUsername(username).isEmpty()) {
             String email = username + "@myblog.com";    // 이메일 디폴트 값 설정
-            Member member = new Member(username, password, email);
-            response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(username));
+            MemberRoleEnum role = admin ? MemberRoleEnum.ADMIN : MemberRoleEnum.USER;
+            if (role.equals(MemberRoleEnum.ADMIN)) {    // 관리자 회원 가입이면
+                String adminKey = requestDto.getAdminKey();
+                if (!adminKey.equals(ADMIN_KEY)) {  // 내장된 ADMIN_KEY, 요청 문자열 비교
+                    throw new IllegalArgumentException("요청한 관리자 키가 틀렸습니다");
+                }
+            }
+            Member member = new Member(username, password, email, role);
+            response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(username, member.getRole()));
             memberRepository.save(member);
             return new MemberResponseDto(member);
         }
-        return null;
+        throw new IllegalArgumentException("중복된 사용자 존재");
     }
 
-    public String login(LoginRequestDto requestDto, HttpServletResponse response) {
+    public void login(LoginRequestDto requestDto, HttpServletResponse response) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
-        Optional<Member> member = memberRepository.findByUsername(username);
-        if (!member.isEmpty()) {
-            Member m = member.get();
-            if (m.getPassword().equals(password)) { // 로그인 성공
-                // Authorization header에 토큰 내용 추가
-                response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(username));
-                return "success";
-            } else {    // 비밀번호 틀림
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return null;
-            }
-        } else {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return null;
+        Member member = memberRepository.findByUsername(username).orElseThrow(
+                () -> new IllegalArgumentException("등록된 사용자 없음"));
+
+        if(!member.getPassword().equals(password)){
+            throw new IllegalArgumentException("비밀번호 일치하지 않습니다");
         }
+
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(member.getUsername(), member.getRole()));
     }
 }

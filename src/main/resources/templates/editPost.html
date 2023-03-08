@@ -40,8 +40,9 @@
                     xhr.setRequestHeader("Authorization", auth);
                 },
                 success: function (response) {
-                    if (response === 'success') {
-                        window.location.reload();
+                    if(response!=null){
+                        let id = response['id']
+                        window.location.href=`/api/posts/${id}`;
                     }
                 }
             });

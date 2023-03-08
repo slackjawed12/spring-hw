@@ -3,6 +3,7 @@ package com.example.springhw.service;
 import com.example.springhw.dto.PostRequestDto;
 import com.example.springhw.dto.PostResponseDto;
 import com.example.springhw.entity.Member;
+import com.example.springhw.entity.MemberRoleEnum;
 import com.example.springhw.entity.Posts;
 import com.example.springhw.jwt.JwtUtil;
 import com.example.springhw.repository.MemberRepository;
@@ -103,7 +104,8 @@ public class PostService {
 
             Member m = member.get();
             Posts p = post.get();
-            if (m.getId().equals(p.getMember().getId())) {  // 멤버 id와 post entity의 멤버 id가 같으면 수정
+            // ADMIN 계정이거나, 멤버 id와 post entity의 멤버 id가 같으면 수정
+            if (m.getRole() == MemberRoleEnum.ADMIN || m.getId().equals(p.getMember().getId())) {
                 p.update(requestDto);
                 return new PostResponseDto(p);
             } else {
@@ -115,7 +117,7 @@ public class PostService {
     }
 
     @Transactional
-    public Long delete(Long id, HttpServletRequest request) {
+    public void delete(Long id, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);   // 헤더에서 토큰 값 가져오기
         Claims claims;
         Optional<Posts> post = postRepository.findById(id);
@@ -127,26 +129,22 @@ public class PostService {
             if (jwtUtil.validateToken(token)) { // 유효한 token
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                return null;
+                return;
             }
 
             // 토큰의 username db에 있는지 확인
             Optional<Member> member = memberRepository.findByUsername(claims.getSubject());
             if (member.isEmpty()) { // DB 사용자 없음
                 log.info("존재하지 않는 사용자의 토큰");
-                return null;
+                return;
             }
 
             Member m = member.get();
             Posts p = post.get();
-            if (m.getId().equals(p.getMember().getId())) {  // 멤버 id와 post entity의 멤버 id가 같으면 삭제
+            // ADMIN 계정이거나, 멤버 id와 post entity의 멤버 id가 같으면 삭제
+            if (m.getRole() == MemberRoleEnum.ADMIN || m.getId().equals(p.getMember().getId())) {
                 postRepository.deleteById(id);
-                return id;
-            } else {
-                return null;
             }
-        } else {
-            return null;
         }
     }
 }

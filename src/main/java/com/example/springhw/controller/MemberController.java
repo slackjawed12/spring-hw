@@ -8,13 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
@@ -26,7 +21,7 @@ public class MemberController {
     private final MemberService memberService;
 
     /**
-     * 한 회원의 userId가 주었을때 회원 정보를 조회하는 API
+     * userId 바탕으로 회원 정보 조회하는 API
      */
     @GetMapping("/{id}")
     public MemberResponseDto getMemberInfo(@PathVariable Long id) {
@@ -36,61 +31,35 @@ public class MemberController {
     /**
      * 회원 전체 목록
      */
-    @GetMapping("/")
+    @GetMapping
     @ResponseBody
     public List<MemberResponseDto> getMemberList() {
         return memberService.findAllMember();
     }
 
     /**
-     * 회원가입 페이지
-     */
-    @GetMapping("/signup")
-    public ModelAndView signupForm() {
-        return new ModelAndView("signup");
-    }
-
-    @GetMapping("/login")
-    public String loginForm() {
-        return "login";
-    }
-
-    /**
-     * 회원 가입
+     * 회원 가입 API
      * request : html form tag - x-www-urlencoded (username, password)
      * response : 로그인 페이지로 리다이렉트
      */
     @PostMapping("/signup")
     public String signup(@ModelAttribute("requestDto") @Valid SignupRequestDto requestDto,
-                                         Model model,
-                                         HttpServletResponse response,
-                                         BindingResult result) {
-        if (result.hasErrors()) {
-            model.addAttribute("msg",
-                    ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getFieldError().getDefaultMessage()));
-            return "index";
-        }
-        MemberResponseDto member = memberService.signup(requestDto, response);
-        model.addAttribute("member", member);
-        model.addAttribute("msg", "success");
+                         HttpServletResponse response) {
+        memberService.signup(requestDto, response);
         return "redirect:/member/login";
     }
 
     /**
-     * 로그인
+     * 로그인 API
      * request : application/json
      * response : message (String)
      * 클라이언트가 쿠키 저장, 리다이렉트 함
      */
+    @ResponseBody
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid LoginRequestDto requestDto, BindingResult result,
-                                        HttpServletResponse response) {
-        log.info("username={}",requestDto.getUsername());
-        log.info("password={}",requestDto.getPassword());
-        if (result.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getFieldError().getDefaultMessage());
-        }
-        String message = memberService.login(requestDto, response);
-        return ResponseEntity.ofNullable(message);
+    public String login(@RequestBody @Valid LoginRequestDto requestDto,
+                                   HttpServletResponse response) {
+        memberService.login(requestDto, response);
+        return "success";
     }
 }

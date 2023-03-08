@@ -1,6 +1,7 @@
 package com.example.springhw.jwt;
 
 
+import com.example.springhw.entity.MemberRoleEnum;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
@@ -37,12 +38,13 @@ public class JwtUtil {
     }
 
     // 토큰 생성
-    public String createToken(String username) {
+    public String createToken(String username, MemberRoleEnum role) {
         Date date = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
                         .setSubject(username)
+                        .claim(AUTHORIZATION_KEY, role)
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME))
                         .setIssuedAt(date)  // 안 넣어도 됨
                         .signWith(key, signatureAlgorithm)

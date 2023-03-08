@@ -1,13 +1,14 @@
 package com.example.springhw.controller;
 
+import com.example.springhw.dto.CommentResponseDto;
 import com.example.springhw.dto.PostRequestDto;
 import com.example.springhw.dto.PostResponseDto;
-import com.example.springhw.entity.Posts;
+import com.example.springhw.service.CommentService;
 import com.example.springhw.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,29 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
+    private final CommentService commentService;
+
+    /**
+     * 게시글 작성
+     * response : 작성 후 해당 게시글 상세보기 페이지로 리다이렉트
+     */
+//    @PostMapping
+    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto requestDto,
+                                                      HttpServletRequest request) {
+        return ResponseEntity.ok(postService.createPost(requestDto, request));
+    }
+
+    /**
+     * 게시글 작성
+     * response : 작성 후 해당 게시글 상세보기 페이지로 리다이렉트
+     */
+    @PostMapping
+    public String createPost2(@RequestBody PostRequestDto requestDto,
+                              HttpServletRequest request) {
+        PostResponseDto post = postService.createPost(requestDto, request);
+//        redirectAttributes.addAttribute("postId", post.getId());
+        return "redirect:/api/posts/"+post.getId();
+    }
 
     /**
      * 전체 게시글 목록 조회 - 작성 날짜 기준 내림차순 정렬
@@ -33,58 +57,36 @@ public class PostController {
     }
 
     /**
-     * 작성 폼
+     * 특정 게시글 조회 - 게시글 id
+     * post - 게시글
+     * comments - 게시글 댓글
      */
-    @GetMapping("/new")
-    public String addPostForm() {
-        return "addPost";
-    }
-
-    /**
-     * 수정 폼
-     */
-    @GetMapping("/{id}/edit")
-    public String editPostForm(@PathVariable Long id, Model model) {
-        PostResponseDto post = postService.getPost(id);
-        model.addAttribute("post", post);
-        return "editPost";
-    }
-
-    /**
-     * 게시글 작성
-     * response : 작성 후 해당 게시글 상세보기 페이지로 리다이렉트
-     */
-    @PostMapping
-    public String createPost(@RequestBody PostRequestDto requestDto,
-                             RedirectAttributes redirectAttributes,
-                             HttpServletRequest request) {
-        PostResponseDto post = postService.createPost(requestDto, request);
-        redirectAttributes.addAttribute("postId", post.getId());
-        return "redirect:/api/posts/{postId}";
-    }
-
     @GetMapping("/{id}")
     public String showPost(@PathVariable Long id, Model model) {
         PostResponseDto post = postService.getPost(id);
+        List<CommentResponseDto> comments = commentService.getComments(id);
         model.addAttribute("post", post);
+        model.addAttribute("comments", comments);
         return "post";
     }
 
+    /**
+     * 게시글 수정
+     */
     @ResponseBody
     @PutMapping("/{id}")
-    public String updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto,
-                             HttpServletRequest request) {
-        log.info("updatePost param id={}", id);
-        PostResponseDto post = postService.update(id, requestDto, request);
-        if (post != null) {
-            return "success";
-        } else {
-            return "fail";
-        }
+    public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto,
+                                                      HttpServletRequest request) {
+        return ResponseEntity.ok(postService.update(id, requestDto, request));
     }
 
+    /**
+     * 게시글 삭제
+     */
     @DeleteMapping("/{id}")
-    public Long deletePost(@PathVariable Long id, HttpServletRequest request) {
-        return postService.delete(id, request);
+    public ResponseEntity<String> deletePost(@PathVariable Long id, HttpServletRequest request) {
+        commentService.delete(id, request); // 댓글 삭제
+        postService.delete(id, request);
+        return ResponseEntity.ok("삭제 성공");
     }
 }

@@ -21,9 +21,14 @@ public class Member {
     @Column(nullable = false)
     String email;
 
-    public Member(String username, String password, String email) {
+    @Column(nullable = false)
+    @Enumerated(value=EnumType.STRING)
+    private MemberRoleEnum role;
+
+    public Member(String username, String password, String email, MemberRoleEnum role) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.role = role;
     }
 }
