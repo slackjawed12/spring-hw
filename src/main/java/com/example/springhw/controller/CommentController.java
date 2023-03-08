@@ -2,18 +2,13 @@ package com.example.springhw.controller;
 
 import com.example.springhw.dto.CommentRequestDto;
 import com.example.springhw.dto.CommentResponseDto;
-import com.example.springhw.dto.PostRequestDto;
-import com.example.springhw.dto.PostResponseDto;
 import com.example.springhw.service.CommentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @Controller
@@ -25,7 +20,7 @@ public class CommentController {
      * 댓글 작성
      */
     @PostMapping("/api/posts/{postId}/comments")
-    public ResponseEntity<String> createPost(@PathVariable Long postId,
+    public ResponseEntity<String> createComment(@PathVariable Long postId,
                                                       @RequestBody CommentRequestDto requestDto,
                                                       HttpServletRequest request) {
         commentService.createComment(postId, requestDto, request);

@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -28,21 +27,21 @@ public class PostController {
      * 게시글 작성
      * response : 작성 후 해당 게시글 상세보기 페이지로 리다이렉트
      */
-//    @PostMapping
+    @PostMapping
     public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto requestDto,
                                                       HttpServletRequest request) {
         return ResponseEntity.ok(postService.createPost(requestDto, request));
     }
 
     /**
-     * 게시글 작성
+     * 게시글 작성 - redirect
      * response : 작성 후 해당 게시글 상세보기 페이지로 리다이렉트
      */
-    @PostMapping
+//    @PostMapping
     public String createPost2(@RequestBody PostRequestDto requestDto,
                               HttpServletRequest request) {
         PostResponseDto post = postService.createPost(requestDto, request);
-//        redirectAttributes.addAttribute("postId", post.getId());
+        // redirectAttributes.addAttribute("postId", post.getId());
         return "redirect:/api/posts/"+post.getId();
     }
 
@@ -66,7 +65,7 @@ public class PostController {
         PostResponseDto post = postService.getPost(id);
         List<CommentResponseDto> comments = commentService.getComments(id);
         model.addAttribute("post", post);
-        model.addAttribute("comments", comments);
+        model.addAttribute("comments", comments);   // 해당 게시글 댓글 목록
         return "post";
     }
 
@@ -83,10 +82,11 @@ public class PostController {
     /**
      * 게시글 삭제
      */
+    @ResponseBody
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePost(@PathVariable Long id, HttpServletRequest request) {
-        commentService.delete(id, request); // 댓글 삭제
+        commentService.delete(id, request); // 게시글의 댓글 삭제
         postService.delete(id, request);
-        return ResponseEntity.ok("삭제 성공");
+        return ResponseEntity.ok("success");
     }
 }

@@ -60,91 +60,76 @@ public class PostService {
             if (jwtUtil.validateToken(token)) { // 유효한 token
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                return null;
+                throw new IllegalArgumentException("유효하지 않은 토큰");
             }
 
             // 토큰의 username db에 있는지 확인
-            Optional<Member> member = memberRepository.findByUsername(claims.getSubject());
-            if (member.isEmpty()) { // DB 사용자 없음
-                log.info("존재하지 않는 사용자의 토큰");
-                return null;
-            }
+            Member member = memberRepository.findByUsername(claims.getSubject())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자의 토큰"));
 
-            Posts post = new Posts(requestDto, member.get());
+            Posts post = new Posts(requestDto, member);
             postRepository.save(post);
             return new PostResponseDto(post);
-        } else {
-            return null;
         }
+        throw new IllegalArgumentException("토큰 없음");
     }
 
     @Transactional
     public PostResponseDto update(Long id, PostRequestDto requestDto, HttpServletRequest request) {
-        log.info("service update param id={}", id);
         String token = jwtUtil.resolveToken(request);   // 헤더에서 토큰 값 가져오기
         Claims claims;
-        Optional<Posts> post = postRepository.findById(id);
-        if (post.isEmpty()) {
-            throw new IllegalArgumentException("잘못된 url");
-        }
+        Posts post = postRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("잘못된 url"));
 
         if (token != null) {    // token 값이 있음
             if (jwtUtil.validateToken(token)) { // 유효한 token
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                return null;
+                throw new IllegalArgumentException("유효하지 않은 토큰");
             }
 
             // 토큰의 username db에 있는지 확인
-            Optional<Member> member = memberRepository.findByUsername(claims.getSubject());
-            if (member.isEmpty()) { // DB 사용자 없음
-                log.info("존재하지 않는 사용자의 토큰");
-                return null;
-            }
+            Member member = memberRepository.findByUsername(claims.getSubject())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자의 토큰"));
 
-            Member m = member.get();
-            Posts p = post.get();
             // ADMIN 계정이거나, 멤버 id와 post entity의 멤버 id가 같으면 수정
-            if (m.getRole() == MemberRoleEnum.ADMIN || m.getId().equals(p.getMember().getId())) {
-                p.update(requestDto);
-                return new PostResponseDto(p);
+            if (member.getRole() == MemberRoleEnum.ADMIN || member.getId().equals(post.getMember().getId())) {
+                post.update(requestDto);
+                return new PostResponseDto(post);
             } else {
-                return null;
+                throw new IllegalArgumentException("수정 권한이 없습니다");
             }
-        } else {
-            return null;
         }
+        throw new IllegalArgumentException("토큰 없음");
     }
 
     @Transactional
     public void delete(Long id, HttpServletRequest request) {
+        log.info("request header={}", request.getHeader("Authorization"));
         String token = jwtUtil.resolveToken(request);   // 헤더에서 토큰 값 가져오기
         Claims claims;
-        Optional<Posts> post = postRepository.findById(id);
-        if (post.isEmpty()) {
-            throw new IllegalArgumentException("잘못된 url");
-        }
+        Posts post = postRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("잘못된 url"));
 
         if (token != null) {    // token 값이 있음
             if (jwtUtil.validateToken(token)) { // 유효한 token
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                return;
+                throw new IllegalArgumentException("유효하지 않은 토큰");
             }
 
             // 토큰의 username db에 있는지 확인
-            Optional<Member> member = memberRepository.findByUsername(claims.getSubject());
-            if (member.isEmpty()) { // DB 사용자 없음
-                log.info("존재하지 않는 사용자의 토큰");
-                return;
-            }
+            Member member = memberRepository.findByUsername(claims.getSubject())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자의 토큰"));
 
-            Member m = member.get();
-            Posts p = post.get();
             // ADMIN 계정이거나, 멤버 id와 post entity의 멤버 id가 같으면 삭제
-            if (m.getRole() == MemberRoleEnum.ADMIN || m.getId().equals(p.getMember().getId())) {
+            if (member.getRole() == MemberRoleEnum.ADMIN || member.getId().equals(post.getMember().getId())) {
                 postRepository.deleteById(id);
+                return;
+            } else {
+                throw new IllegalArgumentException("삭제 권한이 없습니다");
             }
         }
+        throw new IllegalArgumentException("토큰 없음");
     }
 }

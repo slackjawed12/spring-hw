@@ -22,8 +22,6 @@
 </body>
 <script th:inline="javascript">
     function login() {
-        console.log("login call");
-
         let username = $('#username').val();
         let password = $('#password').val();
 
@@ -41,18 +39,17 @@
             contentType: "application/json",
             data: JSON.stringify({username: username, password: password}),
             success: function (response, status, xhr) {
+                let url = window.location.host;
                 if (response === 'success') {
-                    let url = window.location.host;
                     document.cookie =
                         'Authorization' + '=' + xhr.getResponseHeader('Authorization') + ';path=/';
                     window.location.href = 'http://' + url;
-                } else {
-                    alert('로그인에 실패하셨습니다. 다시 로그인해 주세요.')
-                    window.location.reload();
                 }
+            },
+            error: function (response) {    // 400 넘어오면 에러 텍스트 출력
+                document.write(response.responseText);
             }
         })
     }
-
 </script>
 </html>

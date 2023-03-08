@@ -10,14 +10,15 @@
             let cookieData = document.cookie;
             let cookie = cookieData.indexOf('Authorization');
             let auth = '';
-            if(cookie !== -1){
+            if (cookie !== -1) {
                 cookie += cName.length;
                 let end = cookieData.indexOf(';', cookie);
-                if(end === -1)end = cookieData.length;
+                if (end === -1) end = cookieData.length;
                 auth = cookieData.substring(cookie, end);
             }
             return auth;
         }
+
         function writePost() {
             let title = $('#title').val();
             let contents = $('#contents').val();
@@ -38,8 +39,12 @@
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("Authorization", auth);
                 },
-                success: function(response){    // 상세보기 페이지로 이동
-
+                success: function (response) {    // 200 - 상세보기 페이지로 이동
+                    let id = response['id']
+                    window.location.href = `/api/posts/${id}`;
+                },
+                error: function (response) {    // 400 - 에러 텍스트 출력
+                    document.write(response.responseText);
                 }
             });
         }
@@ -54,6 +59,7 @@
     <input id="contents" type="text" name="contents" class="post-input-box">
 
     <button id="post-submit" onclick="writePost()">작성 완료</button>
+    <button th:onclick="|location.href='@{/api/posts/}'|">취소</button>
 </div>
 </body>
 </html>

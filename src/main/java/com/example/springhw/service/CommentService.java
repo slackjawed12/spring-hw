@@ -2,7 +2,6 @@ package com.example.springhw.service;
 
 import com.example.springhw.dto.CommentRequestDto;
 import com.example.springhw.dto.CommentResponseDto;
-import com.example.springhw.dto.PostRequestDto;
 import com.example.springhw.entity.Comment;
 import com.example.springhw.entity.Member;
 import com.example.springhw.entity.MemberRoleEnum;
@@ -18,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,6 +63,7 @@ public class CommentService {
     /**
      * comment 수정
      */
+    @Transactional
     public CommentResponseDto update(Long postId, Long commentId,
                                      CommentRequestDto requestDto, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);   // 헤더에서 토큰 값 가져오기
@@ -90,6 +89,8 @@ public class CommentService {
                         new IllegalArgumentException("존재하지 않는 Comment ID"));
                 comment.update(requestDto);
                 return new CommentResponseDto(comment);
+            } else {
+                throw new IllegalArgumentException("수정 권한 없음");
             }
         }
         throw new IllegalArgumentException("토큰 없음");
@@ -98,6 +99,7 @@ public class CommentService {
     /**
      * 특정 게시글의 comment 모두 삭제 - 게시글 삭제 시 호출
      */
+    @Transactional
     public void delete(Long postId, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);   // 헤더에서 토큰 값 가져오기
         Claims claims;
@@ -118,6 +120,9 @@ public class CommentService {
             // ADMIN 계정이거나, 멤버 id와 post entity의 멤버 id가 같으면 삭제
             if (member.getRole() == MemberRoleEnum.ADMIN || member.getId().equals(post.getMember().getId())) {
                 commentRepository.deleteAllByPost(post);
+                return;
+            } else {
+                throw new IllegalArgumentException("삭제 권한 없음");
             }
         }
         throw new IllegalArgumentException("토큰 없음");
@@ -126,6 +131,7 @@ public class CommentService {
     /**
      * 특정 게시글의 특정 comment 삭제
      */
+    @Transactional
     public void delete(Long postId, Long commentId, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);   // 헤더에서 토큰 값 가져오기
         Claims claims;
@@ -146,6 +152,9 @@ public class CommentService {
             // ADMIN 계정이거나, 멤버 id와 post entity의 멤버 id가 같으면 삭제
             if (member.getRole() == MemberRoleEnum.ADMIN || member.getId().equals(post.getMember().getId())) {
                 commentRepository.deleteById(commentId);
+                return;
+            } else{
+                throw new IllegalArgumentException("삭제 권한 없음");
             }
         }
         throw new IllegalArgumentException("토큰 없음");

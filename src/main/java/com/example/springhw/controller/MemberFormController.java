@@ -1,6 +1,5 @@
 package com.example.springhw.controller;
 
-import com.example.springhw.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

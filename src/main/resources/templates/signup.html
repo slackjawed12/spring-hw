@@ -12,9 +12,13 @@
   <form method="POST" action="/member/signup">
     <div class="login-id-label">Username</div>
     <input type="text" name="username" placeholder="Username" class="login-input-box">
-
     <div class="login-id-label">Password</div>
     <input type="password" name="password" class="login-input-box">
+    <div class="login-id-label">관리자</div>
+    <input type="checkbox" name="admin" class="login-input-checkbox">
+    <div class="login-id-label">관리자 식별 키</div>
+    <input type="password" name="adminKey" class="login-input-box">
+
     <button id="login-id-submit">회원 가입</button>
   </form>
 </div>

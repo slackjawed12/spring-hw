@@ -1,6 +1,5 @@
 package com.example.springhw.dto;
 
-import com.example.springhw.entity.Member;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
