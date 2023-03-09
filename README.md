@@ -9,7 +9,7 @@ POST /member/login : 로그인
 #### 게시글
 GET /api/posts : 전체 게시글 최신 순 조회<br/>
 GET /api/posts/{id} : id에 해당하는 게시글<br/>
-POST /api/posts/ :게시글 작성<br/>
+POST /api/posts :게시글 작성<br/>
 PUT /api/posts/{id} : 게시글 수정<br/>
 DELETE /api/posts/{id} : 게시글 삭제
 
