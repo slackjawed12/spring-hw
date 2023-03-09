@@ -9,12 +9,14 @@ import com.example.springhw.jwt.JwtUtil;
 import com.example.springhw.repository.MemberRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MemberService {
 
@@ -34,8 +36,7 @@ public class MemberService {
                 .map(MemberResponseDto::new).collect(Collectors.toList());
     }
 
-    public MemberResponseDto signup(SignupRequestDto requestDto,
-                                    HttpServletResponse response) {
+    public void signup(SignupRequestDto requestDto) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
         boolean admin = requestDto.isAdmin();
@@ -50,9 +51,8 @@ public class MemberService {
                 }
             }
             Member member = new Member(username, password, email, role);
-            response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(username, member.getRole()));
             memberRepository.save(member);
-            return new MemberResponseDto(member);
+            return;
         }
         throw new IllegalArgumentException("중복된 사용자 존재");
     }
@@ -60,6 +60,7 @@ public class MemberService {
     public void login(LoginRequestDto requestDto, HttpServletResponse response) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
+        log.info("username={}", username);
         Member member = memberRepository.findByUsername(username).orElseThrow(
                 () -> new IllegalArgumentException("등록된 사용자 없음"));
 

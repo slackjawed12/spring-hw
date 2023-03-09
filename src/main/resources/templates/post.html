@@ -70,13 +70,22 @@
         }
 
         // 수정 폼 띄우기
-        function showUpdateForm(commentId){
+        function showUpdateForm(postId, commentId){
+            let original = document.getElementById(commentId);
+            let originalContents = original.getElementsByClassName("comment_text")[0].textContent;
+            $(commentId).hide();
 
+            console.log(originalContents);
+            let replace = `<input id="${commentId}" type="text" name="contents"
+                                    class="post-input-box" value="${originalContents}">
+                            <button onclick="updateComment(${postId}, ${commentId})">수정하기</button>
+                            <button onclick="">취소</button>`;
+            let newElement = document.createElement(replace);
+            original.parentNode.replaceChild(newElement, original);
         }
+
         function updateComment(postId, commentId) {
             let contents = $('#new_comment_contents').val();
-            let original = document.getElementById("comment_text");
-            let replace = `<input id="comment_contents" type="text" name="contents" class="post-input-box">`;
             const auth = getToken();
             if (contents === '') {
                 alert('댓글 내용을 입력해주세요');
@@ -152,15 +161,15 @@
     <button id="comment-submit" th:attr="onclick=|writeComment(${post.id})|">댓글 남기기</button>
 </div>
 
-<div class="comment_wrap">
-    <div th:each="comment : ${comments}">
+<div th:each="comment : ${comments}" class="comment_wrap">
+    <div th:id="${comment.id}">
         <p class="comment_info">
             <span class="comment_username" th:text="${comment.username}">글쓴이</span>
             <span class="comment_date" th:text="${comment.createdAt}">작성 시각</span>
-            <button th:attr="onclick=|updateComment('${post.id}', '${comment.id}')|">댓글 수정</button>
+            <button th:attr="onclick=|showUpdateForm('${post.id}', '${comment.id}')|">댓글 수정</button>
             <button th:attr="onclick=|deleteComment('${post.id}', '${comment.id}')|">댓글 삭제</button>
         </p>
-        <p id="comment_text" class="comment_text" th:text="${comment.contents}">내용</p>
+        <p class="comment_text" th:text="${comment.contents}">내용</p>
     </div>
 </div>
 </body>

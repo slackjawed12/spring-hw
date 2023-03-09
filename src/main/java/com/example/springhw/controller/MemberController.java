@@ -43,9 +43,8 @@ public class MemberController {
      * response : 로그인 페이지로 리다이렉트
      */
     @PostMapping("/signup")
-    public String signup(@ModelAttribute("requestDto") @Valid SignupRequestDto requestDto,
-                         HttpServletResponse response) {
-        memberService.signup(requestDto, response);
+    public String signup(@ModelAttribute("requestDto") @Valid SignupRequestDto requestDto) {
+        memberService.signup(requestDto);
         return "redirect:/member/login";
     }
 
