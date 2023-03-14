@@ -70,27 +70,32 @@
         }
 
         // 수정 폼 띄우기
-        function showUpdateForm(postId, commentId){
+        function showCommentEditForm(postId, commentId){
             let original = document.getElementById(commentId);
-            let originalContents = original.getElementsByClassName("comment_text")[0].textContent;
-            $(commentId).hide();
-
-            console.log(originalContents);
-            let replace = `<input id="${commentId}" type="text" name="contents"
-                                    class="post-input-box" value="${originalContents}">
-                            <button onclick="updateComment(${postId}, ${commentId})">수정하기</button>
-                            <button onclick="">취소</button>`;
-            let newElement = document.createElement(replace);
-            original.parentNode.replaceChild(newElement, original);
+            let input = document.getElementById("edit"+commentId);
+            // let originalContents = original.getElementsByClassName("comment_text")[0].textContent;
+            original.style.display="none";
+            input.style.display="block";
         }
 
-        function updateComment(postId, commentId) {
-            let contents = $('#new_comment_contents').val();
-            const auth = getToken();
+        // 수정 폼 닫기 - 취소 눌렀을 때
+        function closeCommentEditForm(commentId){
+            let original = document.getElementById(commentId);
+            let input = document.getElementById("edit"+commentId);
+            original.style.display="block";
+            input.style.display="none";
+        }
+
+        function editComment(postId, commentId) {
+            let input = document.getElementById("comment_edit_input"+commentId);
+            let contents = input.value;
+            console.log(contents);
             if (contents === '') {
                 alert('댓글 내용을 입력해주세요');
                 return;
             }
+
+            const auth = getToken();
 
             $.ajax({
                 type: "PUT",
@@ -131,6 +136,11 @@
             });
         }
     </script>
+    <style>
+        .comment_edit_form{
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -140,7 +150,7 @@
 <a href="/api/posts">
     <button>전체 글 목록</button>
 </a>
-<a href="/index.html">
+<a href="/">
     <button>메인화면</button>
 </a>
 <div class="post_wrap">
@@ -166,10 +176,15 @@
         <p class="comment_info">
             <span class="comment_username" th:text="${comment.username}">글쓴이</span>
             <span class="comment_date" th:text="${comment.createdAt}">작성 시각</span>
-            <button th:attr="onclick=|showUpdateForm('${post.id}', '${comment.id}')|">댓글 수정</button>
+            <button th:attr="onclick=|showCommentEditForm('${post.id}', '${comment.id}')|">댓글 수정</button>
             <button th:attr="onclick=|deleteComment('${post.id}', '${comment.id}')|">댓글 삭제</button>
         </p>
         <p class="comment_text" th:text="${comment.contents}">내용</p>
+    </div>
+    <div class="comment_edit_form" th:id="'edit'+${comment.id}">
+        <input th:id="'comment_edit_input'+${comment.id}" type="text" name="contents" class="comment-edit-box" th:value="${comment.contents}">
+        <button th:attr="onclick=|editComment('${post.id}', '${comment.id}')|">수정 완료</button>
+        <button th:onclick="|closeCommentEditForm(${comment.id})|">취소</button>
     </div>
 </div>
 </body>
