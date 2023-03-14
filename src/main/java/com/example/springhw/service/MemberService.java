@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +37,7 @@ public class MemberService {
                 .map(MemberResponseDto::new).collect(Collectors.toList());
     }
 
+    @Transactional
     public void signup(SignupRequestDto requestDto) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
@@ -57,6 +59,7 @@ public class MemberService {
         throw new IllegalArgumentException("중복된 사용자 존재");
     }
 
+    @Transactional(readOnly = true)
     public void login(LoginRequestDto requestDto, HttpServletResponse response) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();

@@ -10,14 +10,13 @@ import com.example.springhw.repository.MemberRepository;
 import com.example.springhw.repository.PostRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -52,26 +51,10 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponseDto createPost(PostRequestDto requestDto, HttpServletRequest request) {
-        String token = jwtUtil.resolveToken(request);   // 헤더에서 토큰 값 가져오기
-        Claims claims;
-
-        if (token != null) {    // token 값이 있음
-            if (jwtUtil.validateToken(token)) { // 유효한 token
-                claims = jwtUtil.getUserInfoFromToken(token);
-            } else {
-                throw new IllegalArgumentException("유효하지 않은 토큰");
-            }
-
-            // 토큰의 username db에 있는지 확인
-            Member member = memberRepository.findByUsername(claims.getSubject())
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자의 토큰"));
-
-            Posts post = new Posts(requestDto, member);
-            postRepository.save(post);
-            return new PostResponseDto(post);
-        }
-        throw new IllegalArgumentException("토큰 없음");
+    public PostResponseDto createPost(PostRequestDto requestDto, Member member) {
+        Posts post = new Posts(requestDto, member);
+        postRepository.save(post);
+        return new PostResponseDto(post);
     }
 
     @Transactional

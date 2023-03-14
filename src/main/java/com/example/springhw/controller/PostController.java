@@ -3,12 +3,14 @@ package com.example.springhw.controller;
 import com.example.springhw.dto.CommentResponseDto;
 import com.example.springhw.dto.PostRequestDto;
 import com.example.springhw.dto.PostResponseDto;
+import com.example.springhw.security.UserDetailsImpl;
 import com.example.springhw.service.CommentService;
 import com.example.springhw.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +31,8 @@ public class PostController {
      */
     @PostMapping
     public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto requestDto,
-                                                      HttpServletRequest request) {
-        return ResponseEntity.ok(postService.createPost(requestDto, request));
+                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(postService.createPost(requestDto, userDetails.getMember()));
     }
 
     /**
@@ -39,8 +41,8 @@ public class PostController {
      */
 //    @PostMapping
     public String createPost2(@RequestBody PostRequestDto requestDto,
-                              HttpServletRequest request) {
-        PostResponseDto post = postService.createPost(requestDto, request);
+                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        PostResponseDto post = postService.createPost(requestDto, userDetails.getMember());
         // redirectAttributes.addAttribute("postId", post.getId());
         return "redirect:/api/posts/"+post.getId();
     }
