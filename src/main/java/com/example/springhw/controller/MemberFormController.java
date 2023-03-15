@@ -22,8 +22,8 @@ public class MemberFormController {
     /**
      * 로그인 페이지
      */
-    @GetMapping("/login")
-    public String loginForm() {
-        return "login";
+    @GetMapping("/login-page")
+    public ModelAndView loginForm() {
+        return new ModelAndView("login");
     }
 }

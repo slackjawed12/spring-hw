@@ -1,36 +1,73 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>Blog Service</title>
+    <meta charset="UTF-8">
+    <title>Blog Service</title>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+    <script type="text/javascript" th:src="@{/js/basic.js}"></script>
+    <script>
+        function showAddPostForm(){
+            const auth = getToken();
+            if(auth===''){
+                return;
+            }
+
+            $.ajax({
+                type: 'GET',
+                url: `/api/posts/new`,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Authorization", auth);
+                },
+                success: function(){
+                    window.location.href = `/api/posts/new`;
+                }
+            });
+        }
+        function getToken() {
+            let cName = 'Authorization' + '=';
+            let cookieData = document.cookie;
+            let cookie = cookieData.indexOf('Authorization');
+            let auth = '';
+            if (cookie !== -1) {
+                cookie += cName.length;
+                let end = cookieData.indexOf(';', cookie);
+                if (end === -1) end = cookieData.length;
+                auth = cookieData.substring(cookie, end);
+            }
+
+            // // kakao 로그인 사용한 경우 Bearer 추가
+            // if(auth.indexOf('Bearer') === -1 && auth !== ''){
+            //     auth = 'Bearer ' + auth;
+            // }
+
+            return auth;
+        }
+    </script>
 </head>
 
 <body>
-<a href="/api/posts/new">
-  <button>글 작성하기</button>
-</a>
+<button th:onclick="showAddPostForm()">글 작성하기</button>
 <div class="post-wrap">
-  <table>
-    <tr>
-      <th>제목</th>
-      <th>글쓴이</th>
-      <th>내용</th>
-      <th>작성 시각</th>
-      <th>상세</th>
-    </tr>
-    <tr th:each="post : ${posts}">
-      <td th:text="${post.title}">제목</td>
-      <td th:text="${post.username}">글쓴이</td>
-      <td th:text="${post.contents}">내용</td>
-      <td th:text="${post.createdAt}">작성 시각</td>
-      <td>
-        <button th:onclick="|location.href='@{/api/posts/{postId}(postId=${post.id})}'|">상세보기</button>
-      </td>
-    </tr>
-  </table>
+    <table>
+        <tr>
+            <th>제목</th>
+            <th>글쓴이</th>
+            <th>내용</th>
+            <th>작성 시각</th>
+            <th>상세</th>
+        </tr>
+        <tr th:each="post : ${posts}">
+            <td th:text="${post.title}">제목</td>
+            <td th:text="${post.username}">글쓴이</td>
+            <td th:text="${post.contents}">내용</td>
+            <td th:text="${post.createdAt}">작성 시각</td>
+            <td>
+                <button th:onclick="|location.href='@{/api/posts/{postId}(postId=${post.id})}'|">상세보기</button>
+            </td>
+        </tr>
+    </table>
 </div>
 </body>
 

@@ -100,32 +100,16 @@ public class CommentService {
      * 특정 게시글의 comment 모두 삭제 - 게시글 삭제 시 호출
      */
     @Transactional
-    public void delete(Long postId, HttpServletRequest request) {
-        String token = jwtUtil.resolveToken(request);   // 헤더에서 토큰 값 가져오기
-        Claims claims;
+    public void delete(Long postId, Member member) {
         Posts post = postRepository.findById(postId).orElseThrow(() ->
                 new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
-        if (token != null) {    // token 값이 있음
-            if (jwtUtil.validateToken(token)) { // 유효한 token
-                claims = jwtUtil.getUserInfoFromToken(token);
-            } else {
-                throw new IllegalArgumentException("유효하지 않은 토큰");
-            }
-
-            // 토큰의 username db에 있는지 확인
-            Member member = memberRepository.findByUsername(claims.getSubject())
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자의 토큰"));
-
-            // ADMIN 계정이거나, 멤버 id와 post entity의 멤버 id가 같으면 삭제
-            if (member.getRole() == MemberRoleEnum.ADMIN || member.getId().equals(post.getMember().getId())) {
-                commentRepository.deleteAllByPost(post);
-                return;
-            } else {
-                throw new IllegalArgumentException("삭제 권한 없음");
-            }
+        // ADMIN 계정이거나, 멤버 id와 post entity의 멤버 id가 같으면 댓글 삭제
+        if (member.getRole() == MemberRoleEnum.ADMIN || member.getId().equals(post.getMember().getId())) {
+            commentRepository.deleteAllByPost(post);
+        } else {
+            throw new IllegalArgumentException("삭제 권한 없음");
         }
-        throw new IllegalArgumentException("토큰 없음");
     }
 
     /**
@@ -153,7 +137,7 @@ public class CommentService {
             if (member.getRole() == MemberRoleEnum.ADMIN || member.getId().equals(post.getMember().getId())) {
                 commentRepository.deleteById(commentId);
                 return;
-            } else{
+            } else {
                 throw new IllegalArgumentException("삭제 권한 없음");
             }
         }

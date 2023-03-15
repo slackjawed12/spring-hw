@@ -17,8 +17,15 @@
     <div class="login-id-label">비밀번호</div>
     <input id="password" type="password" name="password" class="login-input-box">
 
-    <button id="login-id-submit" onclick="login()">로그인</button>
+    <button id="login-id-submit" onclick="login()">js 로그인</button>
 </div>
+<form method="POST" action="/member/login">
+    <div class="login-id-label">Username</div>
+    <input type="text" name="username" placeholder="Username" class="login-input-box">
+    <div class="login-id-label">Password</div>
+    <input type="password" name="password" class="login-input-box">
+    <button id="login-submit">form 로그인</button>
+</form>
 </body>
 <script th:inline="javascript">
     function login() {
@@ -36,10 +43,12 @@
         $.ajax({
             type: "POST",
             url: `/member/login`,
+            // contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            // data: {username: username, password: password},
             contentType: "application/json",
             data: JSON.stringify({username: username, password: password}),
             success: function (response, status, xhr) {
-                let url = window.location.host;
+                let url = window.location.host + '/';
                 if (response === 'success') {
                     document.cookie =
                         'Authorization' + '=' + xhr.getResponseHeader('Authorization') + ';path=/';

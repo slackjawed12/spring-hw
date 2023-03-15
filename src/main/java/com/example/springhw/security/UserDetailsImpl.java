@@ -23,7 +23,7 @@ public class UserDetailsImpl implements UserDetails {
     }
 
 
-    // Authentication 객체의 Authorities 가져오기 - ADMIN, USER
+    // member authority : Authentication 객체의 Authorities 가져오기 - ADMIN, USER
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         MemberRoleEnum role = member.getRole();

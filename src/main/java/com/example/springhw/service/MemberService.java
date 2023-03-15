@@ -10,6 +10,7 @@ import com.example.springhw.repository.MemberRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.*;
 
@@ -23,6 +24,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     private static final String ADMIN_KEY = "woohaha";
 
@@ -40,7 +42,7 @@ public class MemberService {
     @Transactional
     public void signup(SignupRequestDto requestDto) {
         String username = requestDto.getUsername();
-        String password = requestDto.getPassword();
+        String password = passwordEncoder.encode(requestDto.getPassword());
         boolean admin = requestDto.isAdmin();
 
         if (memberRepository.findByUsername(username).isEmpty()) {
@@ -63,11 +65,11 @@ public class MemberService {
     public void login(LoginRequestDto requestDto, HttpServletResponse response) {
         String username = requestDto.getUsername();
         String password = requestDto.getPassword();
-        log.info("username={}", username);
+        log.info("Called login username={}", username);
         Member member = memberRepository.findByUsername(username).orElseThrow(
                 () -> new IllegalArgumentException("등록된 사용자 없음"));
 
-        if(!member.getPassword().equals(password)){
+        if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new IllegalArgumentException("비밀번호 일치하지 않습니다");
         }
 

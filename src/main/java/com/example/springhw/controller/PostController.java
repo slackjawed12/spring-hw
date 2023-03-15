@@ -9,6 +9,7 @@ import com.example.springhw.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -27,7 +28,6 @@ public class PostController {
 
     /**
      * 게시글 작성
-     * response : 작성 후 해당 게시글 상세보기 페이지로 리다이렉트
      */
     @PostMapping
     public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto requestDto,
@@ -76,9 +76,10 @@ public class PostController {
      */
     @ResponseBody
     @PutMapping("/{id}")
-    public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto,
-                                                      HttpServletRequest request) {
-        return ResponseEntity.ok(postService.update(id, requestDto, request));
+    public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id,
+                                                      @RequestBody PostRequestDto requestDto,
+                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(postService.update(id, requestDto, userDetails.getMember()));
     }
 
     /**
@@ -86,9 +87,10 @@ public class PostController {
      */
     @ResponseBody
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePost(@PathVariable Long id, HttpServletRequest request) {
-        commentService.delete(id, request); // 게시글의 댓글 삭제
-        postService.delete(id, request);
+    public ResponseEntity<String> deletePost(@PathVariable Long id,
+                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        commentService.delete(id, userDetails.getMember()); // 게시글의 댓글 삭제
+        postService.delete(id, userDetails.getMember());
         return ResponseEntity.ok("success");
     }
 }

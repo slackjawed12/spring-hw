@@ -45,7 +45,7 @@ public class MemberController {
     @PostMapping("/signup")
     public String signup(@ModelAttribute("requestDto") @Valid SignupRequestDto requestDto) {
         memberService.signup(requestDto);
-        return "redirect:/member/login";
+        return "redirect:/member/login-page";
     }
 
     /**
@@ -56,8 +56,9 @@ public class MemberController {
      */
     @ResponseBody
     @PostMapping("/login")
-    public String login(@RequestBody @Valid LoginRequestDto requestDto,
+    public String login(@RequestBody LoginRequestDto requestDto,
                                    HttpServletResponse response) {
+        log.info("Called MemberController username={}", requestDto.getUsername());
         memberService.login(requestDto, response);
         return "success";
     }
