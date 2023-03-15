@@ -20,8 +20,10 @@
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("Authorization", auth);
                 },
-                success: function(){
-                    window.location.href = `/api/posts/new`;
+                success: function(response){
+                    if(response==='success') {
+                        window.location.href = `/api/posts/new`;
+                    }
                 }
             });
         }
