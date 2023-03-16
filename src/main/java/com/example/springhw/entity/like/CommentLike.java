@@ -1,9 +1,8 @@
 package com.example.springhw.entity.like;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.springhw.entity.Comment;
+import com.example.springhw.entity.Member;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,5 +14,16 @@ public class CommentLike {
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
 
+    @Column(nullable = false)
+    @ManyToOne
+    Comment comment;
 
+    @Column(nullable = false)
+    @ManyToOne
+    Member member;
+
+    public CommentLike(Comment comment, Member member) {
+        this.comment = comment;
+        this.member = member;
+    }
 }

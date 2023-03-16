@@ -47,7 +47,7 @@ class LikeServiceTest {
 
         // when, then
         Assertions.assertDoesNotThrow(() -> {
-            likeService.likePost(postId, requestDto, member);
+            likeService.likePost(postId, member);
         });
     }
 

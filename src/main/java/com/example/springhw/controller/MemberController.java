@@ -58,7 +58,6 @@ public class MemberController {
     @PostMapping("/login")
     public String login(@RequestBody LoginRequestDto requestDto,
                                    HttpServletResponse response) {
-        log.info("Called MemberController username={}", requestDto.getUsername());
         memberService.login(requestDto, response);
         return "success";
     }
