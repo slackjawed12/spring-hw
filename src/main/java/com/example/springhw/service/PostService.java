@@ -7,18 +7,14 @@ import com.example.springhw.entity.MemberRoleEnum;
 import com.example.springhw.entity.Posts;
 import com.example.springhw.jwt.JwtUtil;
 import com.example.springhw.repository.MemberRepository;
+import com.example.springhw.repository.PostLikesRepository;
 import com.example.springhw.repository.PostRepository;
-import com.example.springhw.security.UserDetailsImpl;
-import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -26,8 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
-    private final JwtUtil jwtUtil;
+    private final PostLikesRepository postLikesRepository;
 
     @Transactional
     public List<Posts> getPostsInfo() {
@@ -39,7 +34,8 @@ public class PostService {
     public List<PostResponseDto> getAllPosts() {
         List<PostResponseDto> dtoList = new ArrayList<>();
         postRepository.findAllByOrderByModifiedAtDesc().forEach(x -> {
-            PostResponseDto dto = new PostResponseDto(x);
+            Long count = postLikesRepository.countByPost(x);    // 게시글 좋아요 개수 쿼리
+            PostResponseDto dto = new PostResponseDto(x, count);    // dto 변환
             dtoList.add(dto);
         });
 

@@ -5,7 +5,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class PostRequestDto {
-    private String title;
-    private String contents;
+public class LikeRequestDto {
+    private Boolean liked;
 }

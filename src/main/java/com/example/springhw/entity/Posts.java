@@ -2,6 +2,7 @@ package com.example.springhw.entity;
 
 import com.example.springhw.dto.PostRequestDto;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

@@ -5,6 +5,7 @@ import com.example.springhw.dto.PostRequestDto;
 import com.example.springhw.dto.PostResponseDto;
 import com.example.springhw.security.UserDetailsImpl;
 import com.example.springhw.service.CommentService;
+import com.example.springhw.service.LikeService;
 import com.example.springhw.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
     private final CommentService commentService;
+    private final LikeService likeService;
 
     /**
      * 게시글 작성
@@ -44,7 +46,7 @@ public class PostController {
                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
         PostResponseDto post = postService.createPost(requestDto, userDetails.getMember());
         // redirectAttributes.addAttribute("postId", post.getId());
-        return "redirect:/api/posts/"+post.getId();
+        return "redirect:/api/posts/" + post.getId();
     }
 
     /**
@@ -58,7 +60,7 @@ public class PostController {
     }
 
     /**
-     * 특정 게시글 조회 - 게시글 id
+     * 특정 게시글 조회 - Model - ModelAndView
      * post - 게시글
      * comments - 게시글 댓글
      */
@@ -72,7 +74,7 @@ public class PostController {
     }
 
     /**
-     * 게시글 수정
+     * 게시글 수정 - RequestBody, ResponseEntity
      */
     @ResponseBody
     @PutMapping("/{id}")

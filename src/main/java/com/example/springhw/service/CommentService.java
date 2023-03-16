@@ -28,7 +28,7 @@ public class CommentService {
     public List<CommentResponseDto> getComments(Long postId) {
         Posts post = postRepository.findById(postId).orElseThrow(() ->
                 new IllegalArgumentException("게시글이 존재하지 않습니다."));
-        List<Comment> comments = commentRepository.findAllByPost(post);
+        List<Comment> comments = commentRepository.findAllByPostOrderByCreatedAtDesc(post);
         return comments.stream().map(CommentResponseDto::new)
                 .collect(Collectors.toList());
     }
@@ -52,6 +52,7 @@ public class CommentService {
         // 존재하는 postId인지 확인
         Posts post = postRepository.findById(postId).orElseThrow(() ->
                 new IllegalArgumentException("게시글이 존재하지 않습니다."));
+
         if (member.getRole() == MemberRoleEnum.ADMIN || member.getId().equals(post.getMember().getId())) {
             Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
                     new IllegalArgumentException("존재하지 않는 Comment ID"));

@@ -15,6 +15,7 @@ public class PostResponseDto {
     private String contents;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+    private Long likes;
 
     public PostResponseDto(Posts post) {
         this.id = post.getId();
@@ -23,5 +24,15 @@ public class PostResponseDto {
         this.contents = post.getContents();
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
+    }
+
+    public PostResponseDto(Posts post, Long likes) {
+        this.id = post.getId();
+        this.title = post.getTitle();
+        this.username = post.getMember().getUsername();
+        this.contents = post.getContents();
+        this.createdAt = post.getCreatedAt();
+        this.modifiedAt = post.getModifiedAt();
+        this.likes = likes;
     }
 }
