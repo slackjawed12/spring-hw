@@ -34,7 +34,7 @@ public class PostService {
     public List<PostResponseDto> getAllPosts() {
         List<PostResponseDto> dtoList = new ArrayList<>();
         postRepository.findAllByOrderByModifiedAtDesc().forEach(x -> {
-            Long count = postLikesRepository.countByPost(x);    // 게시글 좋아요 개수 쿼리
+            Long count = postLikesRepository.countByPost(x);    // 게시글 좋아요 개수
             PostResponseDto dto = new PostResponseDto(x, count);    // dto 변환
             dtoList.add(dto);
         });
@@ -53,7 +53,7 @@ public class PostService {
     public PostResponseDto createPost(PostRequestDto requestDto, Member member) {
         Posts post = new Posts(requestDto, member);
         postRepository.save(post);
-        return new PostResponseDto(post);
+        return new PostResponseDto(post, 0L);
     }
 
     @Transactional

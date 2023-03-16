@@ -1,6 +1,5 @@
 package com.example.springhw.entity.like;
 
-import com.example.springhw.dto.LikeRequestDto;
 import com.example.springhw.entity.Member;
 import com.example.springhw.entity.Posts;
 import jakarta.persistence.*;
@@ -14,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PostLike {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @ManyToOne

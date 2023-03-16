@@ -32,17 +32,19 @@ public class LikeController {
 
         return ResponseEntity.ok("게시글 좋아요 등록");
     }
+
     /**
      * 게시글 좋아요
      */
     @ResponseBody
-    @PostMapping("/api/posts/{postId}/like")
+//    @PostMapping("/api/posts/{postId}/like")
     public ResponseEntity likePost2(@PathVariable Long postId,
                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         likeService.likePost(postId, userDetails.getMember());
 
         return ResponseEntity.ok("");
     }
+
     /**
      * 댓글 좋아요
      */
